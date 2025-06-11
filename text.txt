@@ -1,0 +1,8 @@
+A file descriptor is an integer that uniquely identifies an opened file 
+of the process. It is stored in the file descriptor table in which elements 
+are pointers to file table entries. One unique file descriptors table is 
+provided in the operating system for each process.
+
+File table entries are a structure in-memory surrogate for an open file, 
+which is created when processing a request to open the file and these entries 
+maintain file position.
