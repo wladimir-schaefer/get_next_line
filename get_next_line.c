@@ -16,21 +16,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+char	*ft_strrchr(const char *s);
+
 size_t	BUFFER_SIZE = 1024;
 
 char	*get_next_line(int fd)
 {
 	char			*line;
+	char			ptr;
 	char			*buffer;
-	static	char	*stored;
+	static	char	**stored;
+	char			*temp;
+	int				i;
 
 	if (fd == -1)
 		return (NULL);
-	stored = malloc(BUFFER_SIZE + 1);
-	read (fd, stored, BUFFER_SIZE);
-	line = stored;
+	i = 1;
+	while (1)
+	{
+		stored = malloc(BUFFER_SIZE * i + 1);
+		read (fd, stored, BUFFER_SIZE);
+		ptr = ft_strrchr(stored);
+		if (ptr)
+		{
+			buffer = 
+			return ();
+		}
+	}
+
 
 	return (line);
+}
+
+
+char	*ft_strrchr(const char *s)
+{
+	char	c = '\n';
+
+	while (*s)
+	{
+		if (*s == c)
+			return (s);
+		s++;
+	}
+	return (NULL);
 }
 //int read(int fileDescriptor, void *buffer, size_t bytesToRead)
 
