@@ -16,50 +16,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char	*ft_strrchr(const char *s);
+int	str_check(const char *s);
 
 size_t	BUFFER_SIZE = 1024;
 
 char	*get_next_line(int fd)
 {
-	char			*line;
-	char			ptr;
-	char			*buffer;
-	static	char	**stored;
-	char			*temp;
+	static	int		start = 0;
+	static	char	*buffer = NULL;
+	static	char	*stored = NULL;
 	int				i;
+	char			*str;
 
 	if (fd == -1)
 		return (NULL);
 	i = 1;
 	while (1)
 	{
-		stored = malloc(BUFFER_SIZE * i + 1);
-		read (fd, stored, BUFFER_SIZE);
-		ptr = ft_strrchr(stored);
-		if (ptr)
+		if (!buffer)
+			read (fd, buffer, BUFFER_SIZE);
+		str = str_check(buffer);
+		if (str)
 		{
-			buffer = 
-			return ();
+
+			return (str);
 		}
+		strcpy (str, stored);
 	}
 
 
-	return (line);
+	return ();
 }
 
 
-char	*ft_strrchr(const char *s)
+int	str_check(const char *s)
 {
-	char	c = '\n';
+	char	c;
+	char	*str;
+	size_t	len;
+	size_t	i;
 
-	while (*s)
+	c = '\n';
+	len = 0;
+	i = 0;
+	while (s[len])
 	{
-		if (*s == c)
-			return (s);
-		s++;
+		if (s[len] == '\n')
+		{
+			len += 2;
+			str = malloc(len);
+			if (!len)
+				return (-1);
+			while (i < len)
+			{
+				str[i] = s[i];
+			}
+			i++;
+			str[len - 1] = '\n';
+			str[len] = '\0';
+		}
+		len++;
+
+
 	}
-	return (NULL);
+	return (str);
 }
 //int read(int fileDescriptor, void *buffer, size_t bytesToRead)
 
