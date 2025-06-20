@@ -16,71 +16,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int	str_check(const char *s);
+char	*ft_strchr(const char *s, int c);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+size_t	ft_strlcat(char *dest, const char *src, size_t dsize);
+
 
 size_t	BUFFER_SIZE = 1024;
 
 char	*get_next_line(int fd)
 {
-	static	int		start = 0;
-	static	char	*buffer = NULL;
-	static	char	*stored = NULL;
+	int				len = 0;
+	char			*buffer;
+	static	char	*cache = NULL;
 	int				i;
 	char			*str;
 
-	if (fd == -1)
+	if (fd == -1 || BUFFER_SIZE <= 0)
 		return (NULL);
 	i = 1;
 	while (1)
 	{
-		if (!buffer)
-			read (fd, buffer, BUFFER_SIZE);
-		str = str_check(buffer);
-		if (str)
+		len = ft_strchr(cache, BUFFER_SIZE);
+		if (len)
 		{
-
+			str = ft_substr(buffer, len);
+			cache = ft_strcat(cache, buffer, len);
 			return (str);
 		}
-		strcpy (str, stored);
-	}
-
-
-	return ();
-}
-
-
-int	str_check(const char *s)
-{
-	char	c;
-	char	*str;
-	size_t	len;
-	size_t	i;
-
-	c = '\n';
-	len = 0;
-	i = 0;
-	while (s[len])
-	{
-		if (s[len] == '\n')
+		buffer = malloc(BUFFER_SIZE + 1);
+		if (read (fd, buffer, BUFFER_SIZE))
 		{
-			len += 2;
-			str = malloc(len);
-			if (!len)
-				return (-1);
-			while (i < len)
+			len = ft_strchr(cache, BUFFER_SIZE);
+			if (len)
 			{
-				str[i] = s[i];
+				str = ft_substr(buffer, len);
+				cache = ft_strcat(cache, buffer, len);
+				return (str);
 			}
-			i++;
-			str[len - 1] = '\n';
-			str[len] = '\0';
+			ft_strcat(cache, buffer, len);
 		}
-		len++;
-
-
+		return (cache);
 	}
-	return (str);
+	return (NULL);
 }
+
 //int read(int fileDescriptor, void *buffer, size_t bytesToRead)
 
 int	main()
