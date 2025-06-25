@@ -22,24 +22,67 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-int	*ft_strchr(const char *s, int size)
+char	*ft_strchr(const char *s, int c)
 {
-	size_t	i;
-	char	c;
-
-	c = "\n";
-	i = 0;
-	while (s[i] && i < size)
+	while (*s)
 	{
-		if (s[i] == c)
-			return (i);
-		i++;
+		if (*s == (char)c)
+			return ((char *)s);
+		s++;
 	}
-	return (0);
+	if ((char)c == '\0')
+		return ((char *)s);
+	return (NULL);
 }
 
-size_t	ft_strlen(const char *s);
-void	*ft_calloc(size_t nmemb, size_t size);
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	size_t	len_s1;
+	size_t	len_s2;
+	size_t	i;
+	size_t	j;
+	char	*res;
+
+	len_s1 = ft_strlen(s1);
+	len_s2 = ft_strlen(s2);
+	res = malloc((len_s1 + len_s2 + 1) * sizeof(char));
+	if (!res)
+		return (NULL);
+	i = 0;
+	while (i < len_s1)
+	{
+		res[i] = s1[i];
+		i++;
+	}
+	j = 0;
+	while (j < len_s2)
+	{
+		res[i + j] = s2[j];
+		j++;
+	}
+	res[i + j] = '\0';
+	return (res);
+}
+
+char	*ft_strdup(const char *s)
+{
+	char	*dst;
+	size_t	len;
+	size_t	i;
+
+	len = ft_strlen(s);
+	dst = malloc((len + 1) * sizeof(char));
+	if (!dst)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		dst[i] = s[i];
+		i++;
+	}
+	dst[i] = '\0';
+	return (dst);
+}
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
@@ -49,16 +92,18 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 
 	if (!s)
 		return (NULL);
-	s_len = ft_strlen(s);
+	s_len = 0;
+	while (s[s_len])
+		s_len++;
 	if (start >= s_len)
-		return (ft_calloc(1, sizeof(char)));
+		return (ft_strdup(""));
 	if (len > s_len - start)
 		len = s_len - start;
-	sub = malloc((len + 1) * sizeof(char));
+	sub = malloc(len + 1);
 	if (!sub)
 		return (NULL);
 	i = 0;
-	while (i < len && s[start + i] != '\0')
+	while (i < len && s[start + i])
 	{
 		sub[i] = s[start + i];
 		i++;
@@ -67,26 +112,3 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (sub);
 }
 
-size_t	ft_strlcat(char *dest, const char *src, size_t dsize)
-{
-	size_t	dest_len;
-	size_t	src_len;
-	size_t	i;
-
-	dest_len = 0;
-	while (dest_len < dsize && dest[dest_len] != '\0')
-		dest_len++;
-	src_len = 0;
-	while (src[src_len] != '\0')
-		src_len++;
-	if (dsize <= dest_len)
-		return (dsize + src_len);
-	i = 0;
-	while ((dest_len + i) < (dsize - 1) && src[i] != '\0')
-	{
-		dest[dest_len + i] = src[i];
-		i++;
-	}
-	dest[dest_len + i] = '\0';
-	return (dest_len + src_len);
-}
