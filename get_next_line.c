@@ -15,39 +15,81 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-size_t	BUFFER_SIZE = 1024;
+#include "get_next_line.h"
 
 char	*get_next_line(int fd)
 {
-
-	char			*buffer;
-	static	char	*cache = NULL;
-	int				i;
+	static char	*cache = NULL;
 	char			*str;
+	char			*newline;
+	ssize_t			bytes;
 
-	if (fd == -1 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-
 	while (1)
 	{
-		if (ft_strchr(cache, '\n'))
-		{
-			str = ft_substr(cache, 0, len);
-			cache = strdup(cache);
-			return (str);
-		}
-		buffer = malloc(BUFFER_SIZE + 1);
-		if (!buffer)
+		newline = ft_strchr(cache, '\n');
+		if (newline)
+			return get_line(&cache, newline);
+		bytes = read_line(fd, &cache);
+		if (bytes == -1)
 			return (NULL);
-		if (read(fd, buffer, BUFFER_SIZE))
+		if (bytes == 0)
 		{
-			buffer[BUFFER_SIZE] = '\0';
-			cache = ft_strjoin(cache, buffer);
+			if (cache && *cache != '\0')
+			{
+				str = cache;
+				cache = NULL;
+				return (str);
+			}
+			free (cache);
+			cache = NULL;
+			return (NULL);
 		}
 	}
-	return (NULL);
 }
+ssize_t	read_line(int fd, char **cache)
+{
+	char	*buffer;
+	char	*tmp;
+	ssize_t	bytes;
+
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (-1);
+	bytes = read(fd, buffer, BUFFER_SIZE);
+	if (bytes > 0)
+	{
+		buffer[bytes] = '\0';
+		tmp = ft_strjoin(*cache, buffer);
+		if (!tmp)
+		{
+			free(*cache);
+			*cache = NULL;
+			free(buffer);
+			return (-1);
+		}
+	}
+	free (*cache);
+	*cache = tmp;
+	return (bytes);
+}
+
+char	*get_line(char **cache, char *newline)
+{
+	char	*str;
+	char	*rest;
+	int		len;
+
+	len = newline - *cache + 1;
+	str = ft_substr(*cache, 0, len);
+	rest = ft_strdup(newline + 1);
+	free (*cache);
+	*cache = rest;
+	return (str);
+}
+
+
 
 //int read(int fileDescriptor, void *buffer, size_t bytesToRead)
 
@@ -55,7 +97,6 @@ int	main()
 {
 	char	*str;
 	int		fd;
-
 
 	fd = open("text.txt", O_RDONLY);
 	while (1)
