@@ -10,15 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include "get_next_line.h"
-
-ssize_t	read_line(int fd, char **cache);
-char	*ft_get_line(char **cache, char *newline);
-char	*helper(int bytes, char **cache);
 
 char	*get_next_line(int fd)
 {
@@ -36,15 +30,15 @@ char	*get_next_line(int fd)
 		else
 			newline = NULL;
 		if (newline)
-			return (ft_get_line(&cache, newline));
-		bytes = read_line(fd, &cache);
-		str = helper(bytes, &cache);
+			return (extract_line(&cache, newline));
+		bytes = read_and_append(fd, &cache);
+		str = handle_read_result(bytes, &cache);
 		if (bytes <= 0)
 			return (str);
 	}
 }
 
-char	*helper(int bytes, char **cache)
+char	*handle_read_result(int bytes, char **cache)
 {
 	char	*str;
 
@@ -70,7 +64,7 @@ char	*helper(int bytes, char **cache)
 	return (NULL);
 }
 
-ssize_t	read_line(int fd, char **cache)
+ssize_t	read_and_append(int fd, char **cache)
 {
 	char	*buffer;
 	char	*tmp;
@@ -99,7 +93,7 @@ ssize_t	read_line(int fd, char **cache)
 	return (free(buffer), bytes);
 }
 
-char	*ft_get_line(char **cache, char *newline)
+char	*extract_line(char **cache, char *newline)
 {
 	char	*str;
 	char	*rest;
@@ -113,6 +107,8 @@ char	*ft_get_line(char **cache, char *newline)
 	return (str);
 }
 
+// #include <stdio.h>
+// #include <fcntl.h>
 // int	main()
 // {
 // 	char	*str;

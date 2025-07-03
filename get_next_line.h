@@ -21,13 +21,13 @@
 # include <stdlib.h>
 
 char	*get_next_line(int fd);
-ssize_t	read_line(int fd, char **cache);
-char	*ft_get_line(char **cache, char *newline);
+ssize_t	read_and_append(int fd, char **cache);
+char	*extract_line(char **cache, char *newline);
 size_t	ft_strlen(const char *s);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strdup(const char *s);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*helper(int bytes, char **cache);
+char	*handle_read_result(int bytes, char **cache);
 
 #endif
