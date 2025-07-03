@@ -10,16 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "get_next_line.h"
 
+ssize_t	read_line(int fd, char **cache);
+char	*ft_get_line(char **cache, char *newline);
+char	*helper(int bytes, char **cache);
+
 char	*get_next_line(int fd)
 {
-	static char	*cache = NULL;
+	static char		*cache;
 	char			*str;
 	char			*newline;
 	ssize_t			bytes;
@@ -28,26 +31,45 @@ char	*get_next_line(int fd)
 		return (NULL);
 	while (1)
 	{
-		newline = ft_strchr(cache, '\n');
+		if (cache)
+			newline = ft_strchr(cache, '\n');
+		else
+			newline = NULL;
 		if (newline)
-			return get_line(&cache, newline);
+			return (ft_get_line(&cache, newline));
 		bytes = read_line(fd, &cache);
-		if (bytes == -1)
-			return (NULL);
-		if (bytes == 0)
-		{
-			if (cache && *cache != '\0')
-			{
-				str = cache;
-				cache = NULL;
-				return (str);
-			}
-			free (cache);
-			cache = NULL;
-			return (NULL);
-		}
+		str = helper(bytes, &cache);
+		if (bytes <= 0)
+			return (str);
 	}
 }
+
+char	*helper(int bytes, char **cache)
+{
+	char	*str;
+
+	if (bytes == -1)
+	{
+		free(*cache);
+		*cache = NULL;
+		return (NULL);
+	}
+	if (bytes == 0)
+	{
+		if (*cache && **cache != '\0')
+		{
+			str = ft_strdup(*cache);
+			free (*cache);
+			*cache = NULL;
+			return (str);
+		}
+		free (*cache);
+		*cache = NULL;
+		return (NULL);
+	}
+	return (NULL);
+}
+
 ssize_t	read_line(int fd, char **cache)
 {
 	char	*buffer;
@@ -61,21 +83,23 @@ ssize_t	read_line(int fd, char **cache)
 	if (bytes > 0)
 	{
 		buffer[bytes] = '\0';
+		if (!*cache)
+			*cache = ft_strdup("");
 		tmp = ft_strjoin(*cache, buffer);
 		if (!tmp)
 		{
+			free(buffer);
 			free(*cache);
 			*cache = NULL;
-			free(buffer);
 			return (-1);
 		}
+		free (*cache);
+		*cache = tmp;
 	}
-	free (*cache);
-	*cache = tmp;
-	return (bytes);
+	return (free(buffer), bytes);
 }
 
-char	*get_line(char **cache, char *newline)
+char	*ft_get_line(char **cache, char *newline)
 {
 	char	*str;
 	char	*rest;
@@ -89,24 +113,29 @@ char	*get_line(char **cache, char *newline)
 	return (str);
 }
 
+// int	main()
+// {
+// 	char	*str;
+// 	int		fd;
 
+// 	fd = open("text.txt", O_RDONLY);
 
-//int read(int fileDescriptor, void *buffer, size_t bytesToRead)
-
-int	main()
-{
-	char	*str;
-	int		fd;
-
-	fd = open("text.txt", O_RDONLY);
-	while (1)
-	{
-		str = get_next_line(fd);
-		if (str)
-			printf("%s", str);
-		else
-			break;
-	}
-	close(fd);
-	return (0);
-}
+// 	if (fd == -1)
+// 	{
+// 		perror("open failed");
+// 		return (1);
+// 	}
+// 	while (1)
+// 	{
+// 		str = get_next_line(fd);
+// 		if (str)
+// 		{
+// 			printf("%s", str);
+// 			free (str);
+// 		}
+// 		else
+// 			break;
+// 	}
+// 	close(fd);
+// 	return (0);
+// }
